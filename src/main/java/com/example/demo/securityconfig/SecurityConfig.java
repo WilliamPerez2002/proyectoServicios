@@ -23,12 +23,14 @@
     import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
     import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
     import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+    import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
     import org.springframework.security.oauth2.core.oidc.user.OidcUser;
     import org.springframework.security.oauth2.core.user.OAuth2User;
     import org.springframework.security.web.SecurityFilterChain;
     import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
     import java.util.ArrayList;
+    import java.util.Collections;
     import java.util.List;
 
 
@@ -133,7 +135,7 @@
                             })
                             .successHandler((request, response, authentication) -> {
 
-                             
+
                                 String userEmail = null;
                                 String username = null;
 
@@ -144,15 +146,15 @@
 
                                 if (userEmail != null && !userEmail.isEmpty()) {
 
-                                   
+
                                     User user = userApi.searchByemail(userEmail);
 
-                                    if (user == null){
+                                    if (user == null) {
 
                                         response.sendRedirect("/login?error");
-                                    }else{
+                                    } else {
 
-                                        
+
                                         username = user.getUsername();
 
                                         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
@@ -161,7 +163,6 @@
                                                 .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")))
                                                 .build();
 
-                                      
 
                                         Authentication newAuth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
@@ -174,7 +175,7 @@
 
 
                                 }
-
+                            })
 
 
                     )

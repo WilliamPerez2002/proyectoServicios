@@ -133,24 +133,48 @@
                             })
                             .successHandler((request, response, authentication) -> {
 
-                                userApi.searchByemail("");
+                             
+                                String userEmail = null;
+                                String username = null;
 
-                                List<GrantedAuthority> authorities = new ArrayList<>();
-                                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                                if (authentication.getPrincipal() instanceof DefaultOidcUser) {
+                                    DefaultOidcUser oidcUser = (DefaultOidcUser) authentication.getPrincipal();
+                                    userEmail = oidcUser.getEmail();
+                                }
 
-                                System.out.println(authentication.getPrincipal().toString());
+                                if (userEmail != null && !userEmail.isEmpty()) {
+
+                                   
+                                    User user = userApi.searchByemail(userEmail);
+
+                                    if (user == null){
+
+                                        response.sendRedirect("/login?error");
+                                    }else{
+
+                                        
+                                        username = user.getUsername();
+
+                                        UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+                                                .username(username)
+                                                .password("")
+                                                .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")))
+                                                .build();
+
+                                      
+
+                                        Authentication newAuth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                                        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+                                        response.sendRedirect("/users");
 
 
+                                    }
 
-                                Authentication newAuth = new UsernamePasswordAuthenticationToken(
-                                        authentication.getPrincipal(), authentication.getCredentials(), authorities);
 
-                                // Establecer el nuevo objeto de autenticación en el contexto de seguridad
-                                SecurityContextHolder.getContext().setAuthentication(newAuth);
+                                }
 
-                                // Redirigir a la página deseada
-                                response.sendRedirect("/users");
-                            })
 
 
                     )

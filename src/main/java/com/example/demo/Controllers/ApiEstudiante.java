@@ -42,8 +42,9 @@ public class ApiEstudiante {
     }
 
     @GetMapping("/get/{cedula}")
-    public Estudiante getEstudianteByID(@PathVariable String cedula ,@RequestBody Estudiante estudiante){
-        estudiante.setCedula(cedula);
-        return estudianteRepository.getReferenceById(estudiante.getCedula());
-    }
+public Estudiante getEstudianteByID(@PathVariable String cedula) {
+    return estudianteRepository.findById(cedula)
+            .orElse(null); // O retorna null si no se encuentra el estudiante con esa ID
+}
+
 }

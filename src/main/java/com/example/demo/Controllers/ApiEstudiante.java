@@ -40,4 +40,10 @@ public class ApiEstudiante {
     public void deleteEstudiante(@PathVariable String cedula){
         estudianteRepository.deleteById(cedula);
     }
+
+    @GetMapping("/get/{cedula}")
+    public Estudiante getEstudianteByID(@PathVariable String cedula ,@RequestBody Estudiante estudiante){
+        estudiante.setCedula(cedula);
+        return estudianteRepository.getReferenceById(estudiante.getCedula());
+    }
 }

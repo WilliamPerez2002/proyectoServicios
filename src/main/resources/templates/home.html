@@ -184,7 +184,7 @@
         success: function(response) {
             // Si la ID existe, mostrar un mensaje de error
             if (response) {
-                alert("La ID ya existe. No se puede sobrescribir el registro existente.");
+                alert("Cedula de estudiante existente.");
             } else {
                 // Si la ID no existe, realizar la solicitud POST para agregar el nuevo registro
                 $.ajax({
@@ -199,18 +199,9 @@
                         "telefono": $('#telefono').val()
                     }),
                     success: function(response) {
-                        $('#addNewUser').modal('hide');
-                        loadUsers(); // Actualizar la tabla después de agregar un estudiante
+                         location.reload(); // Actualizar la tabla después de agregar un estudiante
                     },
-                    error: function(xhr, status, error) {
-                        var errorMessage = "Error desconocido"; // Mensaje predeterminado
-                        if (xhr.status === 400) {
-                            errorMessage = "Error 400: Solicitud incorrecta";
-                        } else if (xhr.status === 500) {
-                            errorMessage = "Error 500: Error interno del servidor";
-                        }
-                        alert("Hubo un error al procesar la solicitud: " + errorMessage);
-                    }
+                  
                 });
             }
         },
@@ -229,18 +220,11 @@
                         "telefono": $('#telefono').val()
                     }),
                     success: function(response) {
-                        $('#addNewUser').modal('hide');
-                        loadUsers(); // Actualizar la tabla después de agregar un estudiante
+                       
+                        location.reload();
+                        // Actualizar la tabla después de agregar un estudiante
                     },
-                    error: function(xhr, status, error) {
-                        var errorMessage = "Error desconocido"; // Mensaje predeterminado
-                        if (xhr.status === 400) {
-                            errorMessage = "Error 400: Solicitud incorrecta";
-                        } else if (xhr.status === 500) {
-                            errorMessage = "Error 500: Error interno del servidor";
-                        }
-                        alert("Hubo un error al procesar la solicitud: " + errorMessage);
-                    }
+                   
                 });
             } else {
                 // Otros errores, como errores de red u otros, se manejan aquí

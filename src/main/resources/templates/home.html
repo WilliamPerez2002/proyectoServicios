@@ -206,7 +206,12 @@
                         success: function(response) {
                             $('#editUser').modal('hide');
                             loadUsers(); // Actualizar la tabla después de editar un estudiante
-                        }
+                        },
+                         error: function(xhr, status, error) {
+          
+            var errorMessage = xhr.responseText;
+            alert("Usuario ya existente" );
+        }
                     });
                 });
                   $("#tblUsers").on('click', '.btnEdit', function(){

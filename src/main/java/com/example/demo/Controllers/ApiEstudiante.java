@@ -41,8 +41,10 @@ public class ApiEstudiante {
         estudianteRepository.deleteById(cedula);
     }
 
-    @GetMapping("/get/{cedula}")
+ @GetMapping("/get/{cedula}")
 public Estudiante getEstudianteByID(@PathVariable String cedula) {
-    return estudianteRepository.findById(cedula);}
+    return estudianteRepository.findById(cedula)
+            .orElse(null); 
+}
 
 }

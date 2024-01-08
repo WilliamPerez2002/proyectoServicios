@@ -169,11 +169,25 @@
 
     $(document).ready(function(){
         loadUsers();
-            $("#add-user-form").submit(function(event){
-                event.preventDefault(); // Evitar la recarga de la página
+              $("#add-user-form").submit(function(event){
+    event.preventDefault(); // Evitar la recarga de la página
+
+    var id = $('#cedula').val(); // Obtener la ID
+
+    // Realizar una solicitud para verificar si la ID ya existe
+    $.ajax({
+        type: "GET",
+        url: "https://services-project-production.up.railway.app/rest/get/"+ id, // Ruta para obtener un estudiante por ID
+        dataType: "json",
+        success: function(response) {
+            // Si la ID existe, mostrar un mensaje de error
+            if (response) {
+                alert("La ID ya existe. No se puede sobrescribir el registro existente.");
+            } else {
+                // Si la ID no existe, realizar la solicitud POST para agregar el nuevo registro
                 $.ajax({
                     type: "POST",
-                    url: "https://services-project-production.up.railway.app/rest/save/"+$('#cedula').val(), // Ruta para insertar un estudiante
+                    url: "https://services-project-production.up.railway.app/rest/save/"+ id,
                     dataType: "json",
                     contentType: 'application/json',
                     data: JSON.stringify({
@@ -183,12 +197,35 @@
                         "telefono": $('#telefono').val()
                     }),
                     success: function(response) {
-                        $('#addNewUser').modal('hide');
-                        loadUsers();
-                        location.reload();// Actualizar la tabla después de agregar un estudiante
+                        location.reload(); // Actualizar la tabla después de agregar un estudiante
+                    },
+                    error: function(xhr, status, error) {
+                        var errorMessage = "Error desconocido"; // Mensaje predeterminado
+                        if (xhr.status === 400) {
+                            errorMessage = "Error 400: Solicitud incorrecta";
+                        } else if (xhr.status === 404) {
+                            errorMessage = "Error 404: Recurso no encontrado";
+                        } else if (xhr.status === 500) {
+                            errorMessage = "Error 500: Error interno del servidor";
+                        }
+                        alert("Hubo un error al procesar la solicitud: " + errorMessage);
                     }
                 });
-            });
+            }
+        },
+        error: function(xhr, status, error) {
+            var errorMessage = "Error desconocido"; // Mensaje predeterminado
+            if (xhr.status === 400) {
+                errorMessage = "Error 400: Solicitud incorrecta";
+            } else if (xhr.status === 404) {
+                errorMessage = "Error 404: Recurso no encontrado";
+            } else if (xhr.status === 500) {
+                errorMessage = "Error 500: Error interno del servidor";
+            }
+            alert("Hubo un error al verificar la existencia de la ID: " + errorMessage);
+        }
+    });
+});
 
             $("#edit-user-form").submit(function(event){
                     event.preventDefault(); // Evitar la recarga de la página

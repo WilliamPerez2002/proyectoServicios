@@ -169,7 +169,9 @@
 
     $(document).ready(function(){
         loadUsers();
-              $("#add-user-form").submit(function(event){
+
+
+        $("#add-user-form").submit(function(event){
     event.preventDefault(); // Evitar la recarga de la página
 
     var id = $('#cedula').val(); // Obtener la ID
@@ -197,14 +199,13 @@
                         "telefono": $('#telefono').val()
                     }),
                     success: function(response) {
-                        location.reload(); // Actualizar la tabla después de agregar un estudiante
+                        $('#addNewUser').modal('hide');
+                        loadUsers(); // Actualizar la tabla después de agregar un estudiante
                     },
                     error: function(xhr, status, error) {
                         var errorMessage = "Error desconocido"; // Mensaje predeterminado
                         if (xhr.status === 400) {
                             errorMessage = "Error 400: Solicitud incorrecta";
-                        } else if (xhr.status === 404) {
-                            errorMessage = "Error 404: Recurso no encontrado";
                         } else if (xhr.status === 500) {
                             errorMessage = "Error 500: Error interno del servidor";
                         }
@@ -214,18 +215,43 @@
             }
         },
         error: function(xhr, status, error) {
-            var errorMessage = "Error desconocido"; // Mensaje predeterminado
-            if (xhr.status === 400) {
-                errorMessage = "Error 400: Solicitud incorrecta";
-            } else if (xhr.status === 404) {
-                errorMessage = "Error 404: Recurso no encontrado";
-            } else if (xhr.status === 500) {
-                errorMessage = "Error 500: Error interno del servidor";
+            // Si hay un error al verificar la existencia de la ID (404 - Recurso no encontrado), permite agregar el nuevo estudiante
+            if (xhr.status === 404) {
+                $.ajax({
+                    type: "POST",
+                    url: "https://services-project-production.up.railway.app/rest/save/"+ id,
+                    dataType: "json",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "nombre": $('#nombre').val(),
+                        "apellido": $('#apellido').val(),
+                        "direccion": $('#direccion').val(),
+                        "telefono": $('#telefono').val()
+                    }),
+                    success: function(response) {
+                        $('#addNewUser').modal('hide');
+                        loadUsers(); // Actualizar la tabla después de agregar un estudiante
+                    },
+                    error: function(xhr, status, error) {
+                        var errorMessage = "Error desconocido"; // Mensaje predeterminado
+                        if (xhr.status === 400) {
+                            errorMessage = "Error 400: Solicitud incorrecta";
+                        } else if (xhr.status === 500) {
+                            errorMessage = "Error 500: Error interno del servidor";
+                        }
+                        alert("Hubo un error al procesar la solicitud: " + errorMessage);
+                    }
+                });
+            } else {
+                // Otros errores, como errores de red u otros, se manejan aquí
+                var errorMessage = "Error desconocido";
+                alert("Hubo un error al verificar la existencia de la ID: " + errorMessage);
             }
-            alert("Hubo un error al verificar la existencia de la ID: " + errorMessage);
         }
     });
 });
+
+        
 
             $("#edit-user-form").submit(function(event){
                     event.preventDefault(); // Evitar la recarga de la página

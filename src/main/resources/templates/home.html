@@ -224,6 +224,11 @@
                         location.reload();
                         // Actualizar la tabla después de agregar un estudiante
                     },
+                     error: function(xhr, status, error) {
+        if(xhr.status === 500){
+            alert("Ponga en un formato correcto los datos");
+        }
+    }
                    
                 });
             } else {

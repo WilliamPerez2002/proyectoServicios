@@ -184,7 +184,7 @@
         success: function(response) {
             // Si la ID existe, mostrar un mensaje de error
             if (response) {
-                alert("Cedula de estudiante existente.");
+                alert("La Cedula del estudiante ya existe.");
             } else {
                 // Si la ID no existe, realizar la solicitud POST para agregar el nuevo registro
                 $.ajax({
@@ -226,7 +226,7 @@
                     },
                      error: function(xhr, status, error) {
         if(xhr.status === 500){
-            alert("Ponga en un formato correcto los datos");
+            alert("Error en formulario");
         }
     }
                    
@@ -234,7 +234,7 @@
             } else {
                 // Otros errores, como errores de red u otros, se manejan aquí
                 var errorMessage = "Error desconocido";
-                alert("Hubo un error al verificar la existencia de la ID: " + errorMessage);
+                alert("Hubo un error: " + errorMessage);
             }
         }
     });

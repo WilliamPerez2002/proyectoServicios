@@ -67,16 +67,12 @@
 <script>
 
     $(document).ready(function(){
-    const token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxODUwNzAwMzM1IiwiaWF0IjoxNzA1MDQxNDg0fQ.oxRyvNlix9TpNHbASSZS-F-kNhbUrN09GB0cNTn48ZU;
         loadUsers();
     function loadUsers() {
         $.ajax({
             url: "https://services-project-production.up.railway.app/rest/all",
             type: "GET",
             dataType: "json",
-             beforeSend: function(xhr) {   //Include the bearer token in header
-            xhr.setRequestHeader("Authorization", 'Bearer ' + token);
-        },
             success: function(data) {
                var html = "";
 

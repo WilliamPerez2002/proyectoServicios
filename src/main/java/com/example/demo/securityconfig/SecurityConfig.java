@@ -23,12 +23,10 @@
     import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
     import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
     import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-    import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
     import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
     import org.springframework.security.oauth2.core.oidc.user.OidcUser;
     import org.springframework.security.oauth2.core.user.OAuth2User;
     import org.springframework.security.web.SecurityFilterChain;
-    import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
     import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
     import java.util.ArrayList;
@@ -43,7 +41,6 @@
         @Autowired
         private ApiUser userApi;
 
-
         @Bean
         public PasswordEncoder passwordEncoder() {
             return new BCryptPasswordEncoder();
@@ -51,10 +48,25 @@
 
 
 
+        /*
         @Bean
-        public JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter() {
-            return new JwtTokenAuthenticationFilter();
+        public UserDetailsService userDetailsService() {
+            return new InMemoryUserDetailsManager(
+                    User.withUsername("user")
+                            .password(passwordEncoder().encode("123"))
+                            .roles("USER")
+                            .build(),
+                    User.withUsername("admin")
+                            .password(passwordEncoder().encode("123"))
+                            .roles("ADMIN")
+                            .build()
+            );
         }
+
+    */
+
+
+
 
 
         @Bean
@@ -93,6 +105,18 @@
 
 
 
+      /*  @Bean
+        SecurityFilterChain security(HttpSecurity security) throws Exception {
+            return  security
+                    .formLogin(form -> form
+                            .permitAll()
+                            .defaultSuccessUrl("/home.html", true) // Redirigir a home.html después de un inicio de sesión exitoso
+                    )
+                    .authorizeHttpRequests((auth -> auth.anyRequest().authenticated()))
+                    .build();
+        }
+
+       */
 
 
         @Bean
@@ -174,14 +198,12 @@
                                     response.sendRedirect("/users");
                                 }
                             })
-                    ).addFilterBefore(jwtTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                    .addFilterBefore(jwtTokenAuthenticationFilter(), OAuth2LoginAuthenticationFilter.class)
+                    )
 
                     .authorizeRequests(authorize ->
                             authorize
                                     .requestMatchers("/").hasAuthority("ROLE_ADMIN")
                                     .requestMatchers("/users").hasAuthority("ROLE_USER")
-                                    .requestMatchers("/rest/**").authenticated()
                                     .requestMatchers("/google").permitAll()
                                     .anyRequest().permitAll()
                     )
@@ -192,6 +214,33 @@
             return new OidcUserService();
         }
 
+
+
+
+
+        /*
+        @Bean<
+        SecurityFilterChain security(HttpSecurity securityy) throws Exception {
+            return  securityy
+                    .formLogin(form -> form
+                            .loginPage("/login.html")
+                            .permitAll()
+                            .defaultSuccessUrl("/home.html", true) // Redirigir a home.html después de un inicio de sesión exitoso
+                    )
+                    .authorizeHttpRequests((auth -> auth.anyRequest().authenticated()))
+                    .build();
+        }
+
+         */
+
+
+    /*
+    @Bean
+    public SecurityFilterChain filterchain(HttpSecurity httsecurity) throws Exception {
+        return httsecurity
+                .csrf().disable().build();
+    }
+    */
 
 
 

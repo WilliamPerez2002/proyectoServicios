@@ -111,7 +111,7 @@
 
                         <div class="d-flex justify-content-center m-3">
 
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
                         </div>
                     </form>
                 </div>
@@ -169,11 +169,28 @@
 
     $(document).ready(function(){
         loadUsers();
-            $("#add-user-form").submit(function(event){
-                event.preventDefault(); // Evitar la recarga de la página
+
+    const token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxODUwNzAwMzM1IiwiaWF0IjoxNzA1MDQxNDg0fQ.oxRyvNlix9TpNHbASSZS-F-kNhbUrN09GB0cNTn48ZU;
+
+        $("#add-user-form").submit(function(event){
+    event.preventDefault(); // Evitar la recarga de la página
+
+    var id = $('#cedula').val(); // Obtener la ID
+
+    // Realizar una solicitud para verificar si la ID ya existe
+    $.ajax({
+        type: "GET",
+        url: "https://services-project-production.up.railway.app/rest/get/"+ id, // Ruta para obtener un estudiante por ID
+        dataType: "json",
+        success: function(response) {
+            // Si la ID existe, mostrar un mensaje de error
+            if (response) {
+                alert("La Cedula del estudiante ya existe.");
+            } else {
+                // Si la ID no existe, realizar la solicitud POST para agregar el nuevo registro
                 $.ajax({
                     type: "POST",
-                    url: "https://services-project-production.up.railway.app/rest/save/"+$('#cedula').val(), // Ruta para insertar un estudiante
+                    url: "https://services-project-production.up.railway.app/rest/save/"+ id,
                     dataType: "json",
                     contentType: 'application/json',
                     data: JSON.stringify({
@@ -183,11 +200,48 @@
                         "telefono": $('#telefono').val()
                     }),
                     success: function(response) {
-                        $('#addNewUser').modal('hide');
-                        loadUsers(); // Actualizar la tabla después de agregar un estudiante
-                    }
+                         location.reload(); // Actualizar la tabla después de agregar un estudiante
+                    },
+                  
                 });
-            });
+            }
+        },
+        error: function(xhr, status, error) {
+            // Si hay un error al verificar la existencia de la ID (404 - Recurso no encontrado), permite agregar el nuevo estudiante
+            if (xhr.status === 404) {
+                $.ajax({
+                    type: "POST",
+                    url: "https://services-project-production.up.railway.app/rest/save/"+ id,
+                    dataType: "json",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "nombre": $('#nombre').val(),
+                        "apellido": $('#apellido').val(),
+                        "direccion": $('#direccion').val(),
+                        "telefono": $('#telefono').val()
+                    }),
+                    success: function(response) {
+                       
+                        location.reload();
+                        // Actualizar la tabla después de agregar un estudiante
+                    },
+                     error: function(xhr, status, error) {
+        if(xhr.status === 500){
+            alert("Error en formulario");
+        }
+    }
+                   
+                });
+            } else {
+                // Otros errores, como errores de red u otros, se manejan aquí
+                var errorMessage = "Error desconocido";
+                alert("Hubo un error: " + errorMessage);
+            }
+        }
+    });
+});
+
+        
 
             $("#edit-user-form").submit(function(event){
                     event.preventDefault(); // Evitar la recarga de la página
@@ -205,7 +259,12 @@
                         success: function(response) {
                             $('#editUser').modal('hide');
                             loadUsers(); // Actualizar la tabla después de editar un estudiante
-                        }
+                        },
+                         error: function(xhr, status, error) {
+          
+            var errorMessage = xhr.responseText;
+            alert("Usuario ya existente" );
+        }
                     });
                 });
                   $("#tblUsers").on('click', '.btnEdit', function(){
@@ -235,6 +294,9 @@
             url: "https://services-project-production.up.railway.app/rest/all",
             type: "GET",
             dataType: "json",
+             beforeSend: function(xhr) {   //Include the bearer token in header
+            xhr.setRequestHeader("Authorization", 'Bearer ' + token);
+        },
             success: function(data) {
                 var btnEdit = '<button type="button" class="btn btn-primary btnEdit" data-bs-toggle="modal" data-bs-target="#editUser"> Editar</button>';
                 var btnDelete = '<button type="button" class="btn btn-primary btn-danger btnDelete" data-bs-toggle="modal" data-bs-target="#editUserModal"> Eliminar</button>';

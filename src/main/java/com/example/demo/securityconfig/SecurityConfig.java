@@ -23,16 +23,12 @@
     import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
     import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
     import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-    import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
-    import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
     import org.springframework.security.oauth2.core.oidc.user.OidcUser;
     import org.springframework.security.oauth2.core.user.OAuth2User;
     import org.springframework.security.web.SecurityFilterChain;
-    import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
     import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
     import java.util.ArrayList;
-    import java.util.Collections;
     import java.util.List;
 
 
@@ -43,7 +39,6 @@
         @Autowired
         private ApiUser userApi;
 
-
         @Bean
         public PasswordEncoder passwordEncoder() {
             return new BCryptPasswordEncoder();
@@ -51,10 +46,25 @@
 
 
 
+        /*
         @Bean
-        public JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter() {
-            return new JwtTokenAuthenticationFilter();
+        public UserDetailsService userDetailsService() {
+            return new InMemoryUserDetailsManager(
+                    User.withUsername("user")
+                            .password(passwordEncoder().encode("123"))
+                            .roles("USER")
+                            .build(),
+                    User.withUsername("admin")
+                            .password(passwordEncoder().encode("123"))
+                            .roles("ADMIN")
+                            .build()
+            );
         }
+
+    */
+
+
+
 
 
         @Bean
@@ -93,6 +103,18 @@
 
 
 
+      /*  @Bean
+        SecurityFilterChain security(HttpSecurity security) throws Exception {
+            return  security
+                    .formLogin(form -> form
+                            .permitAll()
+                            .defaultSuccessUrl("/home.html", true) // Redirigir a home.html después de un inicio de sesión exitoso
+                    )
+                    .authorizeHttpRequests((auth -> auth.anyRequest().authenticated()))
+                    .build();
+        }
+
+       */
 
 
         @Bean
@@ -111,46 +133,23 @@
                             })
                             .successHandler((request, response, authentication) -> {
 
+                                userApi.searchByemail("");
 
-                                String userEmail = null;
-                                String username = null;
+                                List<GrantedAuthority> authorities = new ArrayList<>();
+                                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-                                if (authentication.getPrincipal() instanceof DefaultOidcUser) {
-                                    DefaultOidcUser oidcUser = (DefaultOidcUser) authentication.getPrincipal();
-                                    userEmail = oidcUser.getEmail();
-                                }
-
-                                if (userEmail != null && !userEmail.isEmpty()) {
+                                System.out.println(authentication.getPrincipal().toString());
 
 
-                                    User user = userApi.searchByemail(userEmail);
 
-                                    if (user == null) {
+                                Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                                        authentication.getPrincipal(), authentication.getCredentials(), authorities);
 
-                                        response.sendRedirect("/login?error");
-                                    } else {
+                                // Establecer el nuevo objeto de autenticación en el contexto de seguridad
+                                SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-
-                                        username = user.getUsername();
-
-                                        UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                                                .username(username)
-                                                .password("")
-                                                .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")))
-                                                .build();
-
-
-                                        Authentication newAuth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                                        SecurityContextHolder.getContext().setAuthentication(newAuth);
-
-                                        response.sendRedirect("/users");
-
-
-                                    }
-
-
-                                }
+                                // Redirigir a la página deseada
+                                response.sendRedirect("/users");
                             })
 
 
@@ -174,14 +173,12 @@
                                     response.sendRedirect("/users");
                                 }
                             })
-                    ).addFilterBefore(jwtTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                    .addFilterBefore(jwtTokenAuthenticationFilter(), OAuth2LoginAuthenticationFilter.class)
+                    )
 
                     .authorizeRequests(authorize ->
                             authorize
                                     .requestMatchers("/").hasAuthority("ROLE_ADMIN")
                                     .requestMatchers("/users").hasAuthority("ROLE_USER")
-                                    .requestMatchers("/rest/**").authenticated()
                                     .requestMatchers("/google").permitAll()
                                     .anyRequest().permitAll()
                     )
@@ -192,6 +189,33 @@
             return new OidcUserService();
         }
 
+
+
+
+
+        /*
+        @Bean<
+        SecurityFilterChain security(HttpSecurity securityy) throws Exception {
+            return  securityy
+                    .formLogin(form -> form
+                            .loginPage("/login.html")
+                            .permitAll()
+                            .defaultSuccessUrl("/home.html", true) // Redirigir a home.html después de un inicio de sesión exitoso
+                    )
+                    .authorizeHttpRequests((auth -> auth.anyRequest().authenticated()))
+                    .build();
+        }
+
+         */
+
+
+    /*
+    @Bean
+    public SecurityFilterChain filterchain(HttpSecurity httsecurity) throws Exception {
+        return httsecurity
+                .csrf().disable().build();
+    }
+    */
 
 
 

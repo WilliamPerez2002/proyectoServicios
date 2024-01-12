@@ -57,4 +57,14 @@ public class ApiEstudiante {
         }
     }
 
+    @GetMapping("/search/{cedula}")
+    public ResponseEntity<List<Estudiante>> getEstudiantesByCedula(@PathVariable String cedula) {
+        List<Estudiante> estudiantes = estudianteRepository.findByCedulaContaining(cedula);
+        if (!estudiantes.isEmpty()) {
+            return ResponseEntity.ok(estudiantes);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

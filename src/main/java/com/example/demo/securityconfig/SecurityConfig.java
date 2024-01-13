@@ -204,8 +204,8 @@
                             authorize
                                     .requestMatchers("/").hasAuthority("ROLE_ADMIN")
                                     .requestMatchers("/users").hasAuthority("ROLE_USER")
-                                    .requestMatchers("/google").permitAll()
-                                    .anyRequest().permitAll()
+                                    .requestMatchers("/mobile/**").permitAll()
+                                    .anyRequest().authenticated()
                     )
                     .build();
         }

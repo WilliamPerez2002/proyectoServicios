@@ -11,6 +11,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        input[type="number"]::-webkit-inner-spin-button,
+            input[type="number"]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
 
 </head>
 <body>
@@ -89,7 +99,7 @@
 
                         <div class="form-group">
                             <label for="cedula">Cedula</label>
-                            <input type="text" class="form-control" id="cedula" name="cedula">
+                            <input type="number" class="form-control" id="cedula" name="cedula" oninput="validarNumero(this)" max="9999999999">
                         </div>
                         <div class="form-group">
                             <label for="nombre">Nombre</label>
@@ -105,7 +115,7 @@
                         </div>
                         <div class="form-group">
                             <label for="telefono">Telefono</label>
-                            <input type="text" class="form-control" id="telefono" name="telefono">
+                            <input type="number" class="form-control" id="telefono" name="telefono" oninput="validarNumero(this)" max="9999999999">
                         </div>
 
 
@@ -130,7 +140,7 @@
                     <form id="edit-user-form">
                         <div class="form-group">
                             <label for="cedula">Cedula</label>
-                            <input type="text" class="form-control" id="ecedula" name="cedula" readonly>
+                            <input type="number" class="form-control" id="ecedula" name="cedula" readonly>
                         </div>
                         <div class="form-group">
                             <label for="nombre">Nombre</label>
@@ -146,7 +156,7 @@
                         </div>
                         <div class="form-group">
                             <label for="telefono">Telefono</label>
-                            <input type="text" class="form-control" id="etelefono" name="telefono">
+                            <input type="number" class="form-control" id="etelefono" name="telefono" oninput="validarNumero(this)" max="9999999999">
                         </div>
 
 
@@ -256,5 +266,15 @@
 
 </script>
 
+<script>
+    function validarNumero(input) {
+
+        input.value = input.value.replace(/[^0-9]/g, '');
+
+        if (input.value.length > 10) {
+            input.value = input.value.slice(0, 10);
+        }
+    }
+</script>
 </body>
 </html>
